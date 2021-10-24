@@ -1,5 +1,10 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 
+![alt text](https://github.com/harry1988123/rocketlane/blob/master/1.PNG)
+![alt text](https://github.com/harry1988123/rocketlane/blob/master/2.PNG)
+![alt text](https://github.com/harry1988123/rocketlane/blob/master/3.PNG)
+![alt text](https://github.com/harry1988123/rocketlane/blob/master/4.PNG)
+
 ## Available Scripts
 
 In the project directory, you can run:
