@@ -13,8 +13,12 @@ function App() {
   const [users, setUsers] = useState([]);
   const [reactions, setReactions] = useState([]);
   const [userContentReactions, setUserContentReactions] = useState([]);
-  const [localSelectedEmoji, setLocalSelectedEmoji] = useState([]);
-  const [oneTime, setOneTime] = useState(0);
+  const createData = () => { 
+    let temp = [];
+    for (let i = 1; i <= 30; i++) temp.push({ i, emoji: "", icons: "", emotions: "" });
+    return (temp);
+  };
+  const [localSelectedEmoji, setLocalSelectedEmoji] = useState(createData()); 
   const [current, setCurrent] = useState();
   const { Meta } = Card;
 
@@ -43,12 +47,7 @@ function App() {
     });
   };
 
-  const createData = () => {
-    setOneTime(1);
-    let temp = [];
-    for (let i = 1; i <= users.length; i++) temp.push({ id: i, emoji: "", icons: "", emotions: "" });
-    setLocalSelectedEmoji(temp);
-  }; 
+   
   useEffect(() => {
     fetchOrder(ApiEndPoint + "orders");
     fetchUser(ApiEndPoint + "users");
@@ -78,41 +77,27 @@ function App() {
   const setLocalEmoji = (id, reaction_id, emotions) => {
     const icons = images.filter((d) => d["id"] === emotions);
     const temp = reactions.filter((d) => d["id"] === reaction_id);
+    const newArr = [...localSelectedEmoji]; 
     if (icons.length > 0) {
       if (localSelectedEmoji.length == 0) {
-        setLocalSelectedEmoji([
-          {
-            id: id,
-            emoji: temp.length > 0 ? temp[0]["emoji"] : "",
-            icon: icons[0]["img"],
-            emotions,
-          },
-        ]);
-      } else if (localSelectedEmoji[0].emotions === emotions) {
-        setLocalSelectedEmoji([
-          {
-            id: id,
-            emoji: temp.length > 0 ? temp[0]["emoji"] : "",
-            icon: "",
-            emotions: "",
-          },
-        ]);
+        newArr[id].emoji = temp.length > 0 ? temp[0]["emoji"] : "";
+        newArr[id].icon = icons[0]["img"];
+        newArr[id].emotions = emotions; 
+      } else if (newArr[id].emotions === emotions) {
+        newArr[id].emoji = temp.length > 0 ? temp[0]["emoji"] : "";
+        newArr[id].icon =  "";
+        newArr[id].emotions = "";  
       } else {
-        setLocalSelectedEmoji([
-          {
-            id: id,
-            emoji: temp.length > 0 ? temp[0]["emoji"] : "",
-            icon: icons[0]["img"],
-            emotions,
-          },
-        ]);
+        newArr[id].emoji = temp.length > 0 ? temp[0]["emoji"] : "";
+        newArr[id].icon = icons[0]["img"];
+        newArr[id].emotions = emotions; 
       }
     }
+    setLocalSelectedEmoji(newArr);
   };
 
-  const onSelect = (id, e) => {
+  const onSelect = (id, e) => { 
     setLocalEmoji(id, getEmojiId(e), e);
-    if (oneTime) createData();
     axios
       .post(ApiEndPoint + "user_content_reactions", {
         user_id: id,
@@ -191,14 +176,10 @@ function App() {
                 <span>Selected local</span>
                 <hr />
                 {localSelectedEmoji.length > 0 ? (
-                  localSelectedEmoji
-                    .filter((x) => x["id"] === d["id"])
-                    .map((emoji) => (
-                      <>
-                        <span id={d["id"]}>{emoji["emotions"]} &nbsp;</span>
-                        <img style={{ width: "35px" }} src={emoji["icon"]} id={d["id"]} />
-                      </>
-                    ))
+                <>
+                  <span id={d["id"]}>{localSelectedEmoji[d["id"]]["emotions"]} &nbsp;</span>
+                  <img style={{ width: "35px" }} src={localSelectedEmoji[d["id"]]["icon"]} id={d["id"]} />
+                </>
                 ) : (
                   <div id={d["id"]}>Not selected</div>
                 )}
