@@ -6,6 +6,7 @@ import { Card } from "antd";
 import "antd/dist/antd.css";
 import { FacebookSelector, FacebookSelectorEmoji } from "react-reactions";
 import {} from "react-facebook-emoji";
+import add from "./app/add.png";
 
 function App() {
   const [orders, setOrders] = useState([]);
@@ -14,6 +15,7 @@ function App() {
   const [userContentReactions, setUserContentReactions] = useState([]);
   const [localSelectedEmoji, setLocalSelectedEmoji] = useState([]);
   const [oneTime, setOneTime] = useState(0);
+  const [current, setCurrent] = useState();
   const { Meta } = Card;
 
   const fetchOrder = (ApiEndPoint) => {
@@ -44,12 +46,9 @@ function App() {
   const createData = () => {
     setOneTime(1);
     let temp = [];
-    for (let i = 1; i <= users.length; i++) {
-      temp.push({ id: i, emoji: "", icons: "", emotions: "" });
-    }
+    for (let i = 1; i <= users.length; i++) temp.push({ id: i, emoji: "", icons: "", emotions: "" });
     setLocalSelectedEmoji(temp);
-  };
-  console.log(localSelectedEmoji);
+  }; 
   useEffect(() => {
     fetchOrder(ApiEndPoint + "orders");
     fetchUser(ApiEndPoint + "users");
@@ -79,10 +78,36 @@ function App() {
   const setLocalEmoji = (id, reaction_id, emotions) => {
     const icons = images.filter((d) => d["id"] === emotions);
     const temp = reactions.filter((d) => d["id"] === reaction_id);
-    if (icons.length > 0)
-      setLocalSelectedEmoji([
-        { id: id, emoji: temp.length > 0 ? temp[0]["emoji"] : "", icon: icons[0]["img"], emotions },
-      ]);
+    if (icons.length > 0) {
+      if (localSelectedEmoji.length == 0) {
+        setLocalSelectedEmoji([
+          {
+            id: id,
+            emoji: temp.length > 0 ? temp[0]["emoji"] : "",
+            icon: icons[0]["img"],
+            emotions,
+          },
+        ]);
+      } else if (localSelectedEmoji[0].emotions === emotions) {
+        setLocalSelectedEmoji([
+          {
+            id: id,
+            emoji: temp.length > 0 ? temp[0]["emoji"] : "",
+            icon: "",
+            emotions: "",
+          },
+        ]);
+      } else {
+        setLocalSelectedEmoji([
+          {
+            id: id,
+            emoji: temp.length > 0 ? temp[0]["emoji"] : "",
+            icon: icons[0]["img"],
+            emotions,
+          },
+        ]);
+      }
+    }
   };
 
   const onSelect = (id, e) => {
@@ -104,6 +129,10 @@ function App() {
       );
   };
 
+  const enableEmojiSelector = (id, e) => {
+    id == current ? setCurrent(0) : setCurrent(id);
+  };
+
   return (
     <div className="App">
       {users ? (
@@ -121,11 +150,25 @@ function App() {
                   email={d["email"]}
                   id={d["id"]}
                 />
-                <FacebookSelector
-                  onSelect={(e) => onSelect(d["id"], e, e.img)}
-                  id={d["id"]}
-                />
-                <span>From Api</span>
+                {current === d["id"] ? (
+                  <FacebookSelector
+                    onSelect={(e) => onSelect(d["id"], e, e.img)}
+                    id={d["id"]}
+                  />
+                ) : (
+                  <div></div>
+                )}
+
+                <div style={{ marginTop: "16px" }}>
+                  <img
+                    src={add}
+                    style={{ width: "25px", paddingRight: "5px" }}
+                    onClick={(e) => enableEmojiSelector(d["id"], e)}
+                  />
+                  <br />
+                  <span>From Api</span>
+                </div>
+
                 {userContentReactions ? (
                   userContentReactions
                     .filter((emoji) => emoji["user_id"] === d["id"])
@@ -138,27 +181,26 @@ function App() {
                           )
                           .map((emj) => <h3 id={emj["id"]}>{emj["emoji"]}</h3>)
                       ) : (
-                        <div>Loading emoji</div>
+                        <div id={d["id"]}>Loading emoji</div>
                       )
                     )
                 ) : (
                   <div>Loading emoji</div>
                 )}
-                <hr/>
+                <hr />
                 <span>Selected local</span>
-                <hr/>
+                <hr />
                 {localSelectedEmoji.length > 0 ? (
                   localSelectedEmoji
                     .filter((x) => x["id"] === d["id"])
                     .map((emoji) => (
                       <>
-                        {/* <span key={emoji["id"]}>{emoji["emoji"]}</span> */}
-                        <span>{emoji["emotions"]} &nbsp;</span>
-                        <img style={{ width: "35px" }} src={emoji["icon"]} />
+                        <span id={d["id"]}>{emoji["emotions"]} &nbsp;</span>
+                        <img style={{ width: "35px" }} src={emoji["icon"]} id={d["id"]} />
                       </>
                     ))
                 ) : (
-                  <div>Not selected</div>
+                  <div id={d["id"]}>Not selected</div>
                 )}
               </Card>
             </>
