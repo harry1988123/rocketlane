@@ -13,19 +13,20 @@ function App() {
   const [users, setUsers] = useState([]);
   const [reactions, setReactions] = useState([]);
   const [userContentReactions, setUserContentReactions] = useState([]);
-  const createData = () => { 
+  const createData = () => {
     let temp = [];
-    for (let i = 1; i <= 30; i++) temp.push({ i, emoji: "", icons: "", emotions: "" });
-    return (temp);
+    for (let i = 1; i <= 30; i++)
+      temp.push({ i, emoji: "", icon: "", emotions: "" });
+    return temp;
   };
-  const [localSelectedEmoji, setLocalSelectedEmoji] = useState(createData()); 
+  const [localSelectedEmoji, setLocalSelectedEmoji] = useState(createData());
+  const [count, setCount] = useState();
   const [current, setCurrent] = useState();
   const { Meta } = Card;
 
   const fetchOrder = (ApiEndPoint) => {
     axios.get(ApiEndPoint).then((data) => {
       setOrders(data.data);
-      console.log(orders);
     });
   };
 
@@ -41,13 +42,23 @@ function App() {
     });
   };
 
+  const settingEmojiCount = data => {
+    for (let i = 1; i <= 30; i++){
+      const temp = data.filter((e) => e["user_id"] === i);
+      console.log(temp);
+      for(let j=0;j<temp.length;j++){
+        
+      }
+    }
+  }
+
   const fetchUserContentReaction = (ApiEndPoint) => {
     axios.get(ApiEndPoint).then((data) => {
       setUserContentReactions(data.data);
+      settingEmojiCount(data.data);
     });
   };
 
-   
   useEffect(() => {
     fetchOrder(ApiEndPoint + "orders");
     fetchUser(ApiEndPoint + "users");
@@ -77,26 +88,26 @@ function App() {
   const setLocalEmoji = (id, reaction_id, emotions) => {
     const icons = images.filter((d) => d["id"] === emotions);
     const temp = reactions.filter((d) => d["id"] === reaction_id);
-    const newArr = [...localSelectedEmoji]; 
+    const newArr = [...localSelectedEmoji];
     if (icons.length > 0) {
       if (localSelectedEmoji.length == 0) {
         newArr[id].emoji = temp.length > 0 ? temp[0]["emoji"] : "";
         newArr[id].icon = icons[0]["img"];
-        newArr[id].emotions = emotions; 
+        newArr[id].emotions = emotions;
       } else if (newArr[id].emotions === emotions) {
         newArr[id].emoji = temp.length > 0 ? temp[0]["emoji"] : "";
-        newArr[id].icon =  "";
-        newArr[id].emotions = "";  
+        newArr[id].icon = "";
+        newArr[id].emotions = "";
       } else {
         newArr[id].emoji = temp.length > 0 ? temp[0]["emoji"] : "";
         newArr[id].icon = icons[0]["img"];
-        newArr[id].emotions = emotions; 
+        newArr[id].emotions = emotions;
       }
     }
     setLocalSelectedEmoji(newArr);
   };
 
-  const onSelect = (id, e) => { 
+  const onSelect = (id, e) => {
     setLocalEmoji(id, getEmojiId(e), e);
     axios
       .post(ApiEndPoint + "user_content_reactions", {
@@ -135,54 +146,76 @@ function App() {
                   email={d["email"]}
                   id={d["id"]}
                 />
-                {current === d["id"] ? (
-                  <FacebookSelector
-                    onSelect={(e) => onSelect(d["id"], e, e.img)}
-                    id={d["id"]}
-                  />
-                ) : (
-                  <div></div>
-                )}
-
-                <div style={{ marginTop: "16px" }}>
-                  <img
-                    src={add}
-                    style={{ width: "25px", paddingRight: "5px" }}
-                    onClick={(e) => enableEmojiSelector(d["id"], e)}
-                  />
-                  <br />
-                  <span>From Api</span>
-                </div>
-
-                {userContentReactions ? (
-                  userContentReactions
-                    .filter((emoji) => emoji["user_id"] === d["id"])
-                    .map((dbSelectedEmoji) =>
-                      reactions ? (
-                        reactions
-                          .filter(
-                            (rec) =>
-                              rec["id"] === dbSelectedEmoji["reaction_id"]
-                          )
-                          .map((emj) => <h3 id={emj["id"]}>{emj["emoji"]}</h3>)
-                      ) : (
-                        <div id={d["id"]}>Loading emoji</div>
+                <div
+                  style={{
+                    display: "flex",
+                    padding: "2rem",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                    position: "relative",
+                  }}
+                >
+                  {userContentReactions ? (
+                    userContentReactions
+                      .filter((emoji) => emoji["user_id"] === d["id"])
+                      .map((dbSelectedEmoji) =>
+                        reactions ? (
+                          reactions
+                            .filter(
+                              (rec) =>
+                                rec["id"] === dbSelectedEmoji["reaction_id"]
+                            )
+                            .map((emj) => (
+                              <span id={emj["id"]}>{emj["emoji"]}</span>
+                            ))
+                        ) : (
+                          <div id={d["id"]}>Loading emoji</div>
+                        )
                       )
-                    )
-                ) : (
-                  <div>Loading emoji</div>
-                )}
-                <hr />
-                <span>Selected local</span>
-                <hr />
-                {localSelectedEmoji.length > 0 ? (
-                <>
-                  <span id={d["id"]}>{localSelectedEmoji[d["id"]]["emotions"]} &nbsp;</span>
-                  <img style={{ width: "35px" }} src={localSelectedEmoji[d["id"]]["icon"]} id={d["id"]} />
-                </>
-                ) : (
-                  <div id={d["id"]}>Not selected</div>
-                )}
+                  ) : (
+                    <div>Loading emoji</div>
+                  )}
+                  {localSelectedEmoji.length > 0 &&
+                  localSelectedEmoji[d["id"]]["icon"] != "" ? (
+                    <>
+                      <img
+                        style={{ width: "35px" }}
+                        src={localSelectedEmoji[d["id"]]["icon"]}
+                        id={d["id"]}
+                      />
+                    </>
+                  ) : (
+                    <div id={d["id"]}></div>
+                  )}
+                  {current === d["id"] ? (
+                    <div
+                      style={{
+                        zindex: "1",
+                        position: "absolute",
+                        top: "-2rem",
+                      }}
+                    >
+                      <FacebookSelector
+                        style={{
+                          zindex: "1",
+                          position: "absolute",
+                          top: "15rem",
+                        }}
+                        onSelect={(e) => onSelect(d["id"], e, e.img)}
+                        id={d["id"]}
+                      />
+                    </div>
+                  ) : (
+                    <div></div>
+                  )}
+                  <span>
+                    <img
+                      src={add}
+                      style={{ width: "25px", paddingRight: "5px" }}
+                      onClick={(e) => enableEmojiSelector(d["id"], e)}
+                    />
+                  </span>
+                </div>
               </Card>
             </>
           );
