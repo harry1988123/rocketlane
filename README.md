@@ -7,6 +7,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ![alt text](https://github.com/harry1988123/rocketlane/blob/master/5.PNG)
 ![alt text](https://github.com/harry1988123/rocketlane/blob/master/6.PNG)
 ![alt text](https://github.com/harry1988123/rocketlane/blob/master/7.PNG)
+![alt text](https://github.com/harry1988123/rocketlane/blob/master/8.PNG)
+![alt text](https://github.com/harry1988123/rocketlane/blob/master/9.PNG)
 
 ## Available Scripts
 
