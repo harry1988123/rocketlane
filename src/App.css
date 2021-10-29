@@ -6,38 +6,36 @@
   grid-gap: 2rem;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-float infinite 3s ease-in-out;
-  }
-}
-
-.App-header {
-  min-height: 100vh;
+.emoji_section {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 2rem;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center;
+  position: relative;
 }
 
-.App-link {
-  color: rgb(112, 76, 182);
+.emoji {
+  display: flex;
+  width: 44px;
+  background: #EDF5FF;
+  border: 1px solid #0f62fe;
+  padding: 2px;
+  border-radius: 15px;
 }
 
-@keyframes App-logo-float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+.fb_parent {
+  z-index: 1;
+  position: "absolute";
+  top: -2rem;
+}
+
+.fb {
+  z-index: 1;
+  position: "absolute";
+  top: 15rem;
+}
+
+.emoji_selector {
+  width: 25px;
+  padding-right: 5px;
 }
